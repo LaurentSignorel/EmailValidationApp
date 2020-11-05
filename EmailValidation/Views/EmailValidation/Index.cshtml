@@ -1,0 +1,32 @@
+﻿@model EmailValidation.Models.EmailModel
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div class="row">
+    @using (Html.BeginForm("Index", "EmailValidation", FormMethod.Post))
+    {
+
+        <div class="form-group">
+            @Html.LabelFor(m => m.Email, new { @class = "font-weight-bold" })
+            @Html.TextBoxFor(m => m.Email, new { @class = "form-control", @placeholder = "Email" })
+            @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger d-block" })
+        </div>
+        <button type="submit" class="btn btn-primary">Valider</button>
+
+        
+    }
+</div>
+@if (ViewData.ModelState.Count > 0 && ViewData.ModelState.IsValid)
+{
+    <div class="row mt-3">
+        <div class="form-group">
+            <p>
+                <code>@Model.Email</code> est bien une adresse email valide !
+            </p>            
+            <img src="~/Content/valid.png" class="emailValid" />
+        </div>
+    </div>
+}
