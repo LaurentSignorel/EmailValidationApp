@@ -4,6 +4,11 @@ using System.Linq;
 
 namespace EmailValidation.Helpers
 {
+    /// <summary>
+    /// Attribut de validation de l'identifiant d'un email.
+    /// Afin d'être valide, le l'identifiant du mail doit contenir plus de lettres que de chiffres.
+    /// Les caractères spéciaux ne sont pas pris en compte.
+    /// </summary>
     public class CustomEmailLoginValidationAttribute : ValidationAttribute
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);

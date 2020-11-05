@@ -4,13 +4,13 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace EmailValidation.Test
 {
     /// <summary>
-    /// 
+    /// Classe de test de l'attribut personnalisé : CustomEmailRegexValidationAttribute
     /// </summary>
     [TestClass]
     public class CustomEmailRegexTest
     {
         /// <summary>
-        /// 
+        /// test d'un mail valide : renvoie true
         /// </summary>
         [TestMethod]
         public void CustomEmailRegexValidationAttribute_EmailIsValid()
@@ -25,7 +25,7 @@ namespace EmailValidation.Test
         }
 
         /// <summary>
-        /// 
+        /// test d'un email dont le domaine contient au maximum 3 sous-domaines : renvoie true
         /// </summary>
         [TestMethod]
         public void CustomEmailRegexValidationAttribute_EmailDomainHasThreeOrLessSubDomains()
@@ -40,7 +40,7 @@ namespace EmailValidation.Test
         }
 
         /// <summary>
-        /// 
+        /// test d'un email dont le domaine contient plus de 3 sous-domaines : renvoie false
         /// </summary>
         [TestMethod]
         public void CustomEmailRegexValidationAttribute_EmailDomainHasMoreThanThreeSubDomains()
@@ -55,7 +55,7 @@ namespace EmailValidation.Test
         }
 
         /// <summary>
-        /// 
+        /// test d'un email dont l'identifiant commence par un chiffre : renvoie false
         /// </summary>
         [TestMethod]
         public void CustomEmailRegexValidationAttribute_EmailBeginWithNumber()
@@ -63,30 +63,6 @@ namespace EmailValidation.Test
             // Arrange
             var attrib = new CustomEmailRegexValidationAttribute();
             var value = "6laurent@afnic.fr";
-            // Act
-            var result = attrib.IsValid(value);
-            // Assert
-            Assert.IsFalse(result);
-        }
-
-        [TestMethod]
-        public void CustomEmailRegexValidationAttribute_EmailIsInAuthorizedCountry()
-        {
-            // Arrange
-            var attrib = new CustomEmailRegexValidationAttribute();
-            var value = "laurent@namebay.mc";
-            // Act
-            var result = attrib.IsValid(value);
-            // Assert
-            Assert.IsTrue(result);
-        }
-
-        [TestMethod]
-        public void CustomEmailRegexValidationAttribute_EmailIsNotInAuthorizedCountry()
-        {
-            // Arrange
-            var attrib = new CustomEmailRegexValidationAttribute();
-            var value = "laurent.signorel@outlook.com";
             // Act
             var result = attrib.IsValid(value);
             // Assert

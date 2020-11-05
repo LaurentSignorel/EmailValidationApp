@@ -11,6 +11,10 @@ using Newtonsoft.Json;
 
 namespace EmailValidation.Helpers
 {
+    /// <summary>
+    /// Attribut de validation du domaine d'un email.
+    /// Afin d'être valide, le domaine du mail doit être un domaine valide et être hébergé en france ou dans un des pays limitrophes de la france.
+    /// </summary>
     public class CustomEmailGeolocValidationAttribute : ValidationAttribute
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -34,22 +38,17 @@ namespace EmailValidation.Helpers
                 {
                     return new ValidationResult("Veuillez saisir un email à valider.");
                 }
-
+                // utilisation de la regex de validation, afin de découper par groupes le domaine et l'extension
                 Regex reg = new Regex(_pattern);
-
                 Match match = Regex.Match((string)value, _pattern);
-
                 Group domain = match.Groups["domain"];
                 Group extension = match.Groups["tld"];
-
-                Task<bool> t = Task.Run(() => ShowThreadInfoAsync(domain.Value + extension.Value));
+                Task<bool> t = Task.Run(() => CheckCountryCodeAsync(domain.Value + extension.Value));
                 t.Wait();
-
                 if (!t.Result)
                 {
                     return new ValidationResult("Le domaine n'est pas d'un pays limitrophe à la france ou n'est pas un domaine valide.");
                 }
-
                 return null;
             }
             catch (Exception ex)
@@ -59,7 +58,12 @@ namespace EmailValidation.Helpers
             }
         }
 
-        private async Task<bool> ShowThreadInfoAsync(string fqdn)
+        /// <summary>
+        /// appel à l'api : https://freegeoip.app/ et vérification si code pays retourné est bien dans la liste autorisée
+        /// </summary>
+        /// <param name="fqdn">nom de domaine complètement qualifié (fully qualified domain name)</param>
+        /// <returns></returns>
+        private async Task<bool> CheckCountryCodeAsync(string fqdn)
         {
             using (HttpClient client = new HttpClient())
             {
@@ -70,9 +74,10 @@ namespace EmailValidation.Helpers
                 {
                     string message = await response.Content.ReadAsStringAsync();
                     GeoIpModel geoIp = JsonConvert.DeserializeObject<GeoIpModel>(message);
-                    string test = _validCountries.Find(c => c.Equals(geoIp.CountryCode));
-                    if (!string.IsNullOrEmpty(test))
+                    if (!string.IsNullOrEmpty(_validCountries.Find(c => c.Equals(geoIp.CountryCode))))
+                    {
                         return true;
+                    }
                 }
                 else
                 {

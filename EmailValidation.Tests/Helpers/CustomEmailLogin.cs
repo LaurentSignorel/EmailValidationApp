@@ -4,13 +4,13 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace EmailValidation.Test
 {
     /// <summary>
-    /// 
+    /// Classe de test de l'attribut personnalisé : CustomEmailLoginValidationAttribute
     /// </summary>
     [TestClass]
     public class CustomEmailLoginTest
     {
         /// <summary>
-        /// 
+        /// test d'un mail valide : renvoie true
         /// </summary>
         [TestMethod]
         public void CustomEmailLoginValidationAttribute_EmailIsValid()
@@ -25,7 +25,7 @@ namespace EmailValidation.Test
         }
 
         /// <summary>
-        /// 
+        /// test d'un mail dont l'identifiant contient plus de lettres que de chiffres : renvoie true
         /// </summary>
         [TestMethod]
         public void CustomEmailLoginValidationAttribute_EmailIdentifierHasLessNumbersThanLetters()
@@ -40,7 +40,7 @@ namespace EmailValidation.Test
         }
 
         /// <summary>
-        /// 
+        /// test d'un mail dont l'identifiant contient plus de chiffres que de lettres : renvoie false
         /// </summary>
         [TestMethod]
         public void CustomEmailLoginValidationAttribute_EmailIdentifierHasMoreNumbersThanLetters()
