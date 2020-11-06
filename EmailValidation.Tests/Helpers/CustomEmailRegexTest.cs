@@ -1,5 +1,7 @@
 ﻿using EmailValidation.Helpers;
+using EmailValidation.Services;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Ninject;
 
 namespace EmailValidation.Test
 {
@@ -9,6 +11,15 @@ namespace EmailValidation.Test
     [TestClass]
     public class CustomEmailRegexTest
     {
+        CustomEmailRegexValidationAttribute Attr { get; set; }
+
+        [TestInitialize]
+        public void MyTestInitialize()
+        {
+            var kernel = new StandardKernel();
+            kernel.Bind<IConfigurationService>().To<ConfigurationService>();
+            Attr = kernel.Get<CustomEmailRegexValidationAttribute>();
+        }
         /// <summary>
         /// test d'un mail valide : renvoie true
         /// </summary>
@@ -16,10 +27,9 @@ namespace EmailValidation.Test
         public void CustomEmailRegexValidationAttribute_EmailIsValid()
         {
             // Arrange
-            var attrib = new CustomEmailRegexValidationAttribute();
             var value = "laurent@afnic.fr";
             // Act
-            var result = attrib.IsValid(value);
+            var result = Attr.IsValid(value);
             // Assert
             Assert.IsTrue(result);
         }
@@ -31,10 +41,9 @@ namespace EmailValidation.Test
         public void CustomEmailRegexValidationAttribute_EmailDomainHasThreeOrLessSubDomains()
         {
             // Arrange
-            var attrib = new CustomEmailRegexValidationAttribute();
             var value = "laurent@example.microsoft.verisign.mondomaine.fr";
             // Act
-            var result = attrib.IsValid(value);
+            var result = Attr.IsValid(value);
             // Assert
             Assert.IsTrue(result);
         }
@@ -46,10 +55,9 @@ namespace EmailValidation.Test
         public void CustomEmailRegexValidationAttribute_EmailDomainHasMoreThanThreeSubDomains()
         {
             // Arrange
-            var attrib = new CustomEmailRegexValidationAttribute();
             var value = "laurent@example.microsoft.afnic.verisign.mondomaine.fr";
             // Act
-            var result = attrib.IsValid(value);
+            var result = Attr.IsValid(value);
             // Assert
             Assert.IsFalse(result);
         }
@@ -61,10 +69,9 @@ namespace EmailValidation.Test
         public void CustomEmailRegexValidationAttribute_EmailBeginWithNumber()
         {
             // Arrange
-            var attrib = new CustomEmailRegexValidationAttribute();
             var value = "6laurent@afnic.fr";
             // Act
-            var result = attrib.IsValid(value);
+            var result = Attr.IsValid(value);
             // Assert
             Assert.IsFalse(result);
         }

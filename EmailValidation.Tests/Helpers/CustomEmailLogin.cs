@@ -1,5 +1,7 @@
 ﻿using EmailValidation.Helpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting.Logging;
+using Ninject;
 
 namespace EmailValidation.Test
 {
@@ -9,6 +11,7 @@ namespace EmailValidation.Test
     [TestClass]
     public class CustomEmailLoginTest
     {
+        
         /// <summary>
         /// test d'un mail valide : renvoie true
         /// </summary>

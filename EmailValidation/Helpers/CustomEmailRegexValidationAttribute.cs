@@ -1,4 +1,7 @@
-﻿using System;
+﻿using EmailValidation.Services;
+using Ninject;
+using Ninject.Extensions.Logging;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.Configuration;
 using System.Text.RegularExpressions;
@@ -14,14 +17,10 @@ namespace EmailValidation.Helpers
     /// </summary>
     public class CustomEmailRegexValidationAttribute : ValidationAttribute
     {
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-
-        private readonly string _pattern;
-
-        public CustomEmailRegexValidationAttribute()
-        {
-            _pattern = ConfigurationManager.AppSettings.Get("regexPattern");
-        }
+        [Inject]
+        public ILogger Logger { get; set; }
+        [Inject]
+        public IConfigurationService ConfigurationService { get; set; }
 
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
@@ -32,13 +31,16 @@ namespace EmailValidation.Helpers
                     return new ValidationResult("Veuillez saisir un email à valider.");
                 }
 
-                return Regex.IsMatch((string)value, _pattern)
+                return Regex.IsMatch((string)value, ConfigurationService.RegexPattern)
                     ? null 
                     : new ValidationResult("L'email saisi n'est pas valide.");
             }
             catch (Exception ex)
             {
-                log.Error(ex);
+                if (Logger != null)
+                {
+                    Logger.ErrorException(ex.Message, ex);
+                }
                 return new ValidationResult("Une erreur interne est survenue, merci de recommencer.");
             }
         }

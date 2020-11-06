@@ -1,5 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using EmailValidation.Helpers;
+using Ninject;
+using EmailValidation.Services;
 
 namespace EmailValidation.Test
 {
@@ -9,6 +11,15 @@ namespace EmailValidation.Test
     [TestClass]
     public class CustomEmailGeolocTest
     {
+        CustomEmailGeolocValidationAttribute Attr { get; set; }
+        [TestInitialize]
+        public void MyTestInitialize()
+        {
+            var kernel = new StandardKernel();
+            kernel.Bind<IConfigurationService>().To<ConfigurationService>();
+            kernel.Bind<IGeoLocService>().To<GeoLocService>();
+            Attr = kernel.Get<CustomEmailGeolocValidationAttribute>();
+        }
         /// <summary>
         /// test d'un domaine valide : renvoie true
         /// </summary>
@@ -16,10 +27,9 @@ namespace EmailValidation.Test
         public void CustomEmailGeolocValidationAttribute_DomainIsValid()
         {
             // Arrange
-            var attrib = new CustomEmailGeolocValidationAttribute();
             var value = "laurent@afnic.fr";
             // Act
-            var result = attrib.IsValid(value);
+            var result = Attr.IsValid(value);
             // Assert
             Assert.IsTrue(result);
         }
@@ -31,10 +41,9 @@ namespace EmailValidation.Test
         public void CustomEmailGeolocValidationAttribute_DomainIsNotValid()
         {
             // Arrange
-            var attrib = new CustomEmailGeolocValidationAttribute();
             var value = "laurent@testinvaliddomain.fr";
             // Act
-            var result = attrib.IsValid(value);
+            var result = Attr.IsValid(value);
             // Assert
             Assert.IsFalse(result);
         }
@@ -46,10 +55,9 @@ namespace EmailValidation.Test
         public void CustomEmailGeolocValidationAttribute_DomainIsValidButNotInAllowedCountries()
         {
             // Arrange
-            var attrib = new CustomEmailGeolocValidationAttribute();
             var value = "laurent@example.com";
             // Act
-            var result = attrib.IsValid(value);
+            var result = Attr.IsValid(value);
             // Assert
             Assert.IsFalse(result);
         }
@@ -61,10 +69,9 @@ namespace EmailValidation.Test
         public void CustomEmailGeolocValidationAttribute_EmailIsInAuthorizedCountry()
         {
             // Arrange
-            var attrib = new CustomEmailGeolocValidationAttribute();
             var value = "laurent@namebay.mc";
             // Act
-            var result = attrib.IsValid(value);
+            var result = Attr.IsValid(value);
             // Assert
             Assert.IsTrue(result);
         }

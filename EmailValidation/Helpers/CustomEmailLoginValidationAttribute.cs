@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Ninject;
+using Ninject.Extensions.Logging;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
@@ -11,7 +13,8 @@ namespace EmailValidation.Helpers
     /// </summary>
     public class CustomEmailLoginValidationAttribute : ValidationAttribute
     {
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        [Inject]
+        public ILogger Logger { get; set; }
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
             try
@@ -27,7 +30,10 @@ namespace EmailValidation.Helpers
 
                 int countNumbers = mailId.Count(c => char.IsNumber(c));
 
-                log.Info($"CustomEmailLoginValidation : Email = {value} /Identifier = {mailId} / Letters = {countLetters} / Numbers = {countNumbers}");
+                if (Logger != null)
+                {
+                    Logger.Info($"CustomEmailLoginValidation : Email = {value} /Identifier = {mailId} / Letters = {countLetters} / Numbers = {countNumbers}"); 
+                }
 
                 return countLetters < countNumbers
                     ? new ValidationResult("L'identifiant contient plus de lettres que de chiffres.")
@@ -35,7 +41,10 @@ namespace EmailValidation.Helpers
             }
             catch (Exception ex)
             {
-                log.Error(ex);
+                if (Logger != null)
+                {
+                    Logger.ErrorException(ex.Message, ex); 
+                }
                 return new ValidationResult("Une erreur interne est survenue, merci de recommencer.");
             }
         }

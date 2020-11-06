@@ -2,6 +2,8 @@
 using System.Web.Optimization;
 using System.Web.Routing;
 
+[assembly: log4net.Config.XmlConfigurator(ConfigFile = "Web.config", Watch = true)]
+
 namespace EmailValidation
 {
     public class MvcApplication : System.Web.HttpApplication
@@ -12,8 +14,7 @@ namespace EmailValidation
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
-            log4net.Config.XmlConfigurator.Configure();
-            log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType).Debug("App start");
+            
         }
     }
 }

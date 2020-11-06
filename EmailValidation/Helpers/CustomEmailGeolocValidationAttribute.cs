@@ -6,8 +6,12 @@ using System.Linq;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Web.Mvc;
 using EmailValidation.Models;
+using EmailValidation.Services;
 using Newtonsoft.Json;
+using Ninject;
+using Ninject.Extensions.Logging;
 
 namespace EmailValidation.Helpers
 {
@@ -17,21 +21,15 @@ namespace EmailValidation.Helpers
     /// </summary>
     public class CustomEmailGeolocValidationAttribute : ValidationAttribute
     {
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-
-        private readonly string _pattern;
-        private readonly string _url;
-        private readonly List<string> _validCountries;
-
-        public CustomEmailGeolocValidationAttribute()
-        {
-            _pattern = ConfigurationManager.AppSettings.Get("regexPattern");
-            _validCountries = ConfigurationManager.AppSettings.Get("validCountries").Split(';').ToList();
-            _url = ConfigurationManager.AppSettings.Get("freegeoip");
-        }
+        [Inject]
+        public ILogger Logger { get; set; }
+        [Inject]
+        public IGeoLocService GeoLocService { get; set; }
+        [Inject]
+        public IConfigurationService ConfigurationService { get; set; }
 
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
-        {
+        {            
             try
             {
                 if (value == null)
@@ -39,13 +37,12 @@ namespace EmailValidation.Helpers
                     return new ValidationResult("Veuillez saisir un email à valider.");
                 }
                 // utilisation de la regex de validation, afin de découper par groupes le domaine et l'extension
-                Regex reg = new Regex(_pattern);
-                Match match = Regex.Match((string)value, _pattern);
+                Match match = Regex.Match((string)value, ConfigurationService.RegexPattern);
                 Group domain = match.Groups["domain"];
                 Group extension = match.Groups["tld"];
-                Task<bool> t = Task.Run(() => CheckCountryCodeAsync(domain.Value + extension.Value));
-                t.Wait();
-                if (!t.Result)
+                bool result = GeoLocService.CheckCountryCode(domain.Value + extension.Value);
+
+                if (!result)
                 {
                     return new ValidationResult("Le domaine n'est pas d'un pays limitrophe à la france ou n'est pas un domaine valide.");
                 }
@@ -53,38 +50,12 @@ namespace EmailValidation.Helpers
             }
             catch (Exception ex)
             {
-                log.Error(ex);
+                if (Logger != null)
+                {
+                    Logger.ErrorException(ex.Message, ex);
+                }
                 return new ValidationResult("Une erreur interne est survenue, merci de recommencer.");
             }
-        }
-
-        /// <summary>
-        /// appel à l'api : https://freegeoip.app/ et vérification si code pays retourné est bien dans la liste autorisée
-        /// </summary>
-        /// <param name="fqdn">nom de domaine complètement qualifié (fully qualified domain name)</param>
-        /// <returns></returns>
-        private async Task<bool> CheckCountryCodeAsync(string fqdn)
-        {
-            using (HttpClient client = new HttpClient())
-            {
-                HttpResponseMessage response = await client.GetAsync(_url + fqdn);
-                log.Info($"HTTP response from freegeoip : {response.StatusCode}");
-
-                if (response.IsSuccessStatusCode)
-                {
-                    string message = await response.Content.ReadAsStringAsync();
-                    GeoIpModel geoIp = JsonConvert.DeserializeObject<GeoIpModel>(message);
-                    if (!string.IsNullOrEmpty(_validCountries.Find(c => c.Equals(geoIp.CountryCode))))
-                    {
-                        return true;
-                    }
-                }
-                else
-                {
-                    log.Error($"{response.RequestMessage} - {response.ReasonPhrase}");
-                }
-            }
-            return false;
         }
     }
 }
