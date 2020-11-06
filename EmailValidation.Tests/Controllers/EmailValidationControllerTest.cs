@@ -1,5 +1,4 @@
-﻿using System;
-using System.Web.Mvc;
+﻿using System.Web.Mvc;
 using EmailValidation.Controllers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 

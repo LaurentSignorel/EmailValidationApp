@@ -1,17 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Configuration;
-using System.Linq;
-using System.Net.Http;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Web.Mvc;
-using EmailValidation.Models;
-using EmailValidation.Services;
-using Newtonsoft.Json;
+﻿using EmailValidation.Services;
 using Ninject;
 using Ninject.Extensions.Logging;
+using System;
+using System.ComponentModel.DataAnnotations;
+using System.Text.RegularExpressions;
 
 namespace EmailValidation.Helpers
 {

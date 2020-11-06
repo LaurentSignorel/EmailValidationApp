@@ -1,7 +1,5 @@
 ﻿using EmailValidation.Helpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Microsoft.VisualStudio.TestTools.UnitTesting.Logging;
-using Ninject;
 
 namespace EmailValidation.Test
 {

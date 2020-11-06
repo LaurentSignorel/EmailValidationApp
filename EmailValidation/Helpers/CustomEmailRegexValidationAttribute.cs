@@ -3,7 +3,6 @@ using Ninject;
 using Ninject.Extensions.Logging;
 using System;
 using System.ComponentModel.DataAnnotations;
-using System.Configuration;
 using System.Text.RegularExpressions;
 
 namespace EmailValidation.Helpers
